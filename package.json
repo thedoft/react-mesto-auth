@@ -1,9 +1,9 @@
 {
-  "name": "mesto-react",
+  "name": "react-mesto-auth",
   "version": "0.1.0",
   "private": true,
   "author": "thedoft",
-  "description": "Mesto app build with react",
+  "description": "Mesto app with authentification",
   "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.5",
