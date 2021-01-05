@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 
 import Header from './Header';
 import ProtectedRoute from './ProtectedRoute';
@@ -17,6 +17,8 @@ import { api } from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function App() {
+  const history = useHistory();
+
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [currentUser, setCurrentUser] = useState({});
 
@@ -169,24 +171,44 @@ function App() {
       });
   }
 
+  const [headerNavlinkPath, setHeaderNavlinkPath] = useState('/');
+  const [headerNavlinkText, setHeaderNavlinkText] = useState('');
+  const [headerUserLogin, setHeaderUserLogin] = useState('');
+
+  function setHeaderNavlinkData(path, text) {
+    setHeaderNavlinkPath(path);
+    setHeaderNavlinkText(text);
+  }
+
+  function handleLogin(evt) {
+    evt.preventDefault();
+
+    history.push('/');
+  }
+
+  function handleRegister(evt) {
+    evt.preventDefault();
+
+    history.push('/signin');
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
 
-      <Header />
+      <Header
+        isLoggedIn={isLoggedIn}
+        userLogin={headerUserLogin}
+        navlinkPath={headerNavlinkPath}
+        navlinkText={headerNavlinkText}
+      />
 
       <main className="main">
         <Switch>
-          <Route path="/signin">
-            <Login />
-          </Route>
-
-          <Route path="/signup">
-            <Register />
-          </Route>
-
           <ProtectedRoute
-            path='/'
+            exact path='/'
             isLoggedIn={isLoggedIn}
+            setHeaderNavlinkData={setHeaderNavlinkData}
+            setHeaderUserLogin={setHeaderUserLogin}
             component={Main}
             onEditAvatar={handleEditAvatarClick}
             onEditProfile={handleEditProfileClick}
@@ -196,6 +218,34 @@ function App() {
             onCardLike={handleCardLikeClick}
             onCardDelete={handleCardDeleteClick}
           />
+
+          <Route path="/signin">
+            {
+              /*isLoggedIn
+              ? <Redirect to="/" />
+              :*/ <Login
+                  isLoading={isLoading}
+                  onSubmit={handleLogin}
+                  setHeaderNavlinkData={setHeaderNavlinkData}
+                />
+            }
+          </Route>
+
+          <Route path="/signup">
+            {
+              /*isLoggedIn
+              ? <Redirect to="/" />
+              : */<Register
+                  isLoading={isLoading}
+                  onSubmit={handleRegister}
+                  setHeaderNavlinkData={setHeaderNavlinkData}
+                />
+            }
+          </Route>
+
+          <Route path="*">
+            <Redirect to="/" />
+          </Route>
         </Switch>
       </main>
 

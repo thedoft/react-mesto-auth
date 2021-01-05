@@ -20,7 +20,7 @@ function ImagePopup(props) {
     <div ref={popup} onClick={handleLayoutClick} className={`popup popup_type_image ${props.isOpen ? 'popup_opened' : ''}`}>
       <div className="popup__container">
         <img className="popup__image" src={card.link} alt={card.name} />
-          <p className="popup__subtitle">{card.name}</p>
+        <p className="popup__subtitle">{card.name}</p>
         <button onClick={props.onClose} type="reset" className="popup__close-button" />
       </div>
     </div>

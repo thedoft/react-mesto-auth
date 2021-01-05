@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import Card from './Card';
 
 function Main(props) {
   const currentUser = React.useContext(CurrentUserContext);
+
+  useEffect(() => {
+    props.setHeaderNavlinkData('/signin', 'Выйти');
+    props.setHeaderUserLogin('Pidor');
+
+    return () => {
+      props.setHeaderUserLogin('');
+      props.setHeaderNavlinkData('/', '');
+    }
+  });
 
   return (
     <>
