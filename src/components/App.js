@@ -86,6 +86,7 @@ function App() {
       .then((res) => {
         if (res.token) {
           localStorage.setItem('token', res.token);
+          localStorage.setItem('login', email);
           setIsLoggedIn(true);
           setHeaderUserLogin(email);
         } else {
@@ -121,6 +122,7 @@ function App() {
 
   useEffect(() => {
     checkToken();
+    setHeaderUserLogin(localStorage.getItem('login'));
   }, []);
 
   useEffect(() => {
