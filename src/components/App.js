@@ -15,8 +15,9 @@ import ImagePopup from './ImagePopup';
 import ConfirmPopup from './ConfirmPopup';
 import InfoTooltip from './InfoTooltip';
 
-import { api } from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import { api } from '../utils/api';
+import * as auth from '../utils/auth';
 
 import infoTooltipOkImage from '../images/info-tooltip-ok.svg';
 import infoTooltipErrorImage from '../images/info-tooltip-error.svg';
@@ -24,7 +25,7 @@ import infoTooltipErrorImage from '../images/info-tooltip-error.svg';
 function App() {
   const history = useHistory();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
 
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -37,7 +38,89 @@ function App() {
   const [selectedCard, setSelectedCard] = useState(<></>);
   const [cards, setCards] = useState([]);
 
+  const [headerNavlinkPath, setHeaderNavlinkPath] = useState('/');
+  const [headerNavlinkText, setHeaderNavlinkText] = useState('');
+  const [headerUserLogin, setHeaderUserLogin] = useState('');
+
+  const [infoTooltipTitle, setInfoTooltipTitle] = useState('');
+  const [infoTooltipImage, setInfoTooltipImage] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
+
+  function setHeaderNavlinkData(path, text) {
+    setHeaderNavlinkPath(path);
+    setHeaderNavlinkText(text);
+  }
+
+  function setInfoTooltipOk() {
+    setInfoTooltipTitle('Вы успешно зарегистрировались!');
+    setInfoTooltipImage(infoTooltipOkImage);
+  }
+
+  function setInfoTooltipError() {
+    setInfoTooltipTitle('Что-то пошло не так! Попробуйте еще раз.');
+    setInfoTooltipImage(infoTooltipErrorImage);
+  }
+
+  function handleRegister({ email, password }) {
+    setIsLoading(true);
+
+    auth.register({ email, password })
+      .then(() => {
+        setIsInfoTooltipOpen(true);
+        setInfoTooltipOk();
+
+        history.push('/signin');
+      })
+      .catch(() => {
+        setIsInfoTooltipOpen(true);
+        setInfoTooltipError();
+      })
+      .finally(() => setIsLoading(false));
+  }
+
+  function handleLogin({ email, password }) {
+    setIsLoading(true);
+
+    auth.login({ email, password })
+      .then((res) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          setIsLoggedIn(true);
+        } else {
+          return;
+        }
+      })
+      .catch(() => {
+        setIsInfoTooltipOpen(true);
+        setInfoTooltipError();
+      })
+      .finally(() => setIsLoading(false));
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+  }
+
+  function checkToken() {
+    if (localStorage.getItem('token')) {
+      const token = localStorage.getItem('token');
+
+      auth.getContent(token)
+        .then((res) => {
+          setIsLoggedIn(true);
+          setHeaderUserLogin(res.data.email);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  useEffect(() => {
+    checkToken();
+  }, []);
 
   useEffect(() => {
     api.getUserData()
@@ -141,9 +224,7 @@ function App() {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   }
 
   function handleUpdateAvatar({ avatar }) {
@@ -157,9 +238,7 @@ function App() {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   }
 
   function handleAddCard({ name, link }) {
@@ -173,41 +252,7 @@ function App() {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
-  const [headerNavlinkPath, setHeaderNavlinkPath] = useState('/');
-  const [headerNavlinkText, setHeaderNavlinkText] = useState('');
-  const [headerUserLogin, setHeaderUserLogin] = useState('');
-
-  const [infoTooltipTitle, setInfoTooltipTitle] = useState('');
-  const [infoTooltipImage, setInfoTooltipImage] = useState('');
-
-  function setHeaderNavlinkData(path, text) {
-    setHeaderNavlinkPath(path);
-    setHeaderNavlinkText(text);
-  }
-
-  function handleLogin(evt) {
-    evt.preventDefault();
-
-    setIsInfoTooltipOpen(true);
-    setInfoTooltipTitle('Вы успешно зарегистрировались!');
-    setInfoTooltipImage(infoTooltipOkImage);
-
-    history.push('/');
-  }
-
-  function handleRegister(evt) {
-    evt.preventDefault();
-
-    setIsInfoTooltipOpen(true);
-    setInfoTooltipTitle('Что-то пошло не так! Попробуйте еще раз.');
-    setInfoTooltipImage(infoTooltipErrorImage);
-
-    history.push('/signin');
+      .finally(() => setIsLoading(false));
   }
 
   return (
@@ -218,6 +263,7 @@ function App() {
         userLogin={headerUserLogin}
         navlinkPath={headerNavlinkPath}
         navlinkText={headerNavlinkText}
+        onSignOut={handleSignOut}
       />
 
       <main className="main">
@@ -226,7 +272,6 @@ function App() {
             exact path='/'
             isLoggedIn={isLoggedIn}
             setHeaderNavlinkData={setHeaderNavlinkData}
-            setHeaderUserLogin={setHeaderUserLogin}
             component={Main}
             onEditAvatar={handleEditAvatarClick}
             onEditProfile={handleEditProfileClick}
@@ -239,9 +284,9 @@ function App() {
 
           <Route path="/signin">
             {
-              /*isLoggedIn
+              isLoggedIn
               ? <Redirect to="/" />
-              :*/ <Login
+              : <Login
                   isLoading={isLoading}
                   onSubmit={handleLogin}
                   setHeaderNavlinkData={setHeaderNavlinkData}
@@ -251,9 +296,9 @@ function App() {
 
           <Route path="/signup">
             {
-              /*isLoggedIn
+              isLoggedIn
               ? <Redirect to="/" />
-              : */<Register
+              : <Register
                   isLoading={isLoading}
                   onSubmit={handleRegister}
                   setHeaderNavlinkData={setHeaderNavlinkData}

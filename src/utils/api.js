@@ -1,33 +1,23 @@
+import { handlePromiseRes } from './utils';
+
 class Api {
   constructor(options) {
     this._url = options.url;
     this._headers = options.headers;
   }
 
-  _handlePromiseRes(res) {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  }
-
   getUserData() {
     return fetch(`${this._url}/users/me`, {
       headers: this._headers
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   getInitialCards() {
     return fetch(`${this._url}/cards`, {
       headers: this._headers
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   patchUserProfile({ name, about }) {
@@ -39,9 +29,7 @@ class Api {
         about
       })
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   patchUserAvatar({ avatar }) {
@@ -52,9 +40,7 @@ class Api {
         avatar
       })
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   addNewCard({ name, link }) {
@@ -66,9 +52,7 @@ class Api {
         link
       })
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   deleteCard({ _id }) {
@@ -76,9 +60,7 @@ class Api {
       method: 'DELETE',
       headers: this._headers
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 
   changeLikeCardStatus({ _id }, method) {
@@ -86,9 +68,7 @@ class Api {
       method: method,
       headers: this._headers,
     })
-    .then(res => {
-      return this._handlePromiseRes(res);
-    });
+    .then(res => handlePromiseRes(res))
   }
 }
 

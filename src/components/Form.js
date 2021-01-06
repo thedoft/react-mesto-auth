@@ -13,10 +13,9 @@ export default function Form(props) {
   }
 
   function handleSubmit(evt) {
-    props.onSubmit(evt);
+    evt.preventDefault();
 
-    setEmail('');
-    setPassword('');
+    props.onSubmit({ email, password });
   }
 
   function handleFocus(evt) {

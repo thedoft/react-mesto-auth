@@ -7,10 +7,8 @@ function Main(props) {
 
   useEffect(() => {
     props.setHeaderNavlinkData('/signin', 'Выйти');
-    props.setHeaderUserLogin('Pidor');
 
     return () => {
-      props.setHeaderUserLogin('');
       props.setHeaderNavlinkData('/', '');
     }
   });
