@@ -35,7 +35,7 @@ function App() {
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
-  const [selectedCard, setSelectedCard] = useState(<></>);
+  const [selectedCard, setSelectedCard] = useState({});
   const [cards, setCards] = useState([]);
 
   const [headerNavlinkPath, setHeaderNavlinkPath] = useState('/');
