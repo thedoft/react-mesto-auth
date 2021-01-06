@@ -1,13 +1,14 @@
 import { handlePromiseRes } from './utils';
 
 export const BASE_URL = 'https://auth.nomoreparties.co';
+export const headers = {
+  'Content-Type': 'application/json'
+};
 
 export function register({ email, password }) {
   return fetch(`${BASE_URL}/signup`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({
       email,
       password
@@ -19,9 +20,7 @@ export function register({ email, password }) {
 export function login({ email, password }) {
   return fetch(`${BASE_URL}/signin`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({
       email,
       password
@@ -33,7 +32,7 @@ export function login({ email, password }) {
 export function getContent(jwt) {
   return fetch(`${BASE_URL}/users/me`, {
     headers: {
-      'Content-Type': 'application/json',
+      ...headers,
       'Authorization' : `Bearer ${jwt}`
     },
   })

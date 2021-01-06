@@ -16,7 +16,7 @@ import ConfirmPopup from './ConfirmPopup';
 import InfoTooltip from './InfoTooltip';
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { api } from '../utils/api';
+import * as api from '../utils/api';
 import * as auth from '../utils/auth';
 
 import infoTooltipOkImage from '../images/info-tooltip-ok.svg';
@@ -87,6 +87,7 @@ function App() {
         if (res.token) {
           localStorage.setItem('token', res.token);
           setIsLoggedIn(true);
+          setHeaderUserLogin(email);
         } else {
           return;
         }
@@ -101,6 +102,7 @@ function App() {
   function handleSignOut() {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
+    setHeaderUserLogin('');
   }
 
   function checkToken() {
@@ -108,9 +110,8 @@ function App() {
       const token = localStorage.getItem('token');
 
       auth.getContent(token)
-        .then((res) => {
+        .then(() => {
           setIsLoggedIn(true);
-          setHeaderUserLogin(res.data.email);
         })
         .catch((err) => {
           console.log(err);
