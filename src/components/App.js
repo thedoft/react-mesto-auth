@@ -7,14 +7,19 @@ import Main from './Main';
 import Login from './Login';
 import Register from './Register';
 import Footer from './Footer';
+
 import EditAvatarPopup from './EditAvatarPopup';
 import EditProfilePopup from './EditProfilePopup';
 import AddCardPopup from './AddCardPopup';
 import ImagePopup from './ImagePopup';
 import ConfirmPopup from './ConfirmPopup';
+import InfoTooltip from './InfoTooltip';
 
 import { api } from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+
+import infoTooltipOkImage from '../images/info-tooltip-ok.svg';
+import infoTooltipErrorImage from '../images/info-tooltip-error.svg';
 
 function App() {
   const history = useHistory();
@@ -27,6 +32,7 @@ function App() {
   const [isAddCardPopupOpen, setIsAddCardPopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
   const [selectedCard, setSelectedCard] = useState(<></>);
   const [cards, setCards] = useState([]);
@@ -121,6 +127,7 @@ function App() {
     setIsAddCardPopupOpen(false);
     setIsImagePopupOpen(false);
     setIsConfirmPopupOpen(false);
+    setIsInfoTooltipOpen(false);
   }
 
   function handleUpdateUser({ name, about }) {
@@ -175,6 +182,9 @@ function App() {
   const [headerNavlinkText, setHeaderNavlinkText] = useState('');
   const [headerUserLogin, setHeaderUserLogin] = useState('');
 
+  const [infoTooltipTitle, setInfoTooltipTitle] = useState('');
+  const [infoTooltipImage, setInfoTooltipImage] = useState('');
+
   function setHeaderNavlinkData(path, text) {
     setHeaderNavlinkPath(path);
     setHeaderNavlinkText(text);
@@ -183,11 +193,19 @@ function App() {
   function handleLogin(evt) {
     evt.preventDefault();
 
+    setIsInfoTooltipOpen(true);
+    setInfoTooltipTitle('Вы успешно зарегистрировались!');
+    setInfoTooltipImage(infoTooltipOkImage);
+
     history.push('/');
   }
 
   function handleRegister(evt) {
     evt.preventDefault();
+
+    setIsInfoTooltipOpen(true);
+    setInfoTooltipTitle('Что-то пошло не так! Попробуйте еще раз.');
+    setInfoTooltipImage(infoTooltipErrorImage);
 
     history.push('/signin');
   }
@@ -289,6 +307,15 @@ function App() {
         onLayout={handleLayoutClick}
         onEscape={handleEscapeClose}
         isLoading={isLoading}
+      />
+
+      <InfoTooltip name="info-tooltip"
+        isOpen={isInfoTooltipOpen}
+        onClose={closeAllPopups}
+        onLayout={handleLayoutClick}
+        onEscape={handleEscapeClose}
+        title={infoTooltipTitle}
+        image={infoTooltipImage}
       />
 
     </CurrentUserContext.Provider>

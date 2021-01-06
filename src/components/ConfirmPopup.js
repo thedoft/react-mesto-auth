@@ -16,7 +16,6 @@ function ConfirmPopup(props) {
     props.onConfirm(props.card);
   }
 
-
   return (
     <PopupWithForm onSubmit={handleSubmit}
     onClose={props.onClose}
